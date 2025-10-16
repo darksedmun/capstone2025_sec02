@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TipoReciclaje {
+  PLASTICO
+  VIDRIO
+  PAPEL
+  METAL
+  ORGANICO
+  OTRO
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  email     String   @unique
+  name      String
+  phone     String?
+  role      Role     @default(USER)
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  qrCodes     QRCode[]     @relation("UserQRCodes")
+  reciclajes  Reciclaje[]  @relation("UserReciclajes")
+  resetTokens ResetToken[]
+}
+
+model QRCode {
+  id     Int       @id @default(autoincrement())
+  code   String    @unique
+  tipo   String    @default("generico")
+  points Int       @default(50)
+  used   Boolean   @default(false)
+  usedAt DateTime?
+  usedBy Int?
+  user   User?     @relation("UserQRCodes", fields: [usedBy], references: [id])
+}
+
+model Reciclaje {
+  id        Int           @id @default(autoincrement())
+  userId    Int
+  user      User          @relation("UserReciclajes", fields: [userId], references: [id])
+  tipo      TipoReciclaje
+  points    Int
+  createdAt DateTime      @default(now())
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model ResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
