@@ -13,11 +13,11 @@ const OUT_DIR = path.join(process.cwd(), "generated-qrs");
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const QRS = [
-  { code: "RECYCLE67890", tipo: "PLASTICO", points: 300 },
-  { code: "RECYCLE67891", tipo: "VIDRIO", points: 150 },
-  { code: "RECYCLE67892", tipo: "PAPEL", points: 500 },
-  { code: "RECYCLE67893", tipo: "METAL", points: 200 },
-  { code: "RECYCLE67894", tipo: "ORGANICO", points: 250 },
+  { code: "RECYCLE67890", tipo: "PLASTICO", points: 1300 },
+  { code: "RECYCLE67891", tipo: "VIDRIO", points: 1500 },
+  { code: "RECYCLE67892", tipo: "PAPEL", points: 2500 },
+  { code: "RECYCLE67893", tipo: "METAL", points: 2000 },
+  { code: "RECYCLE67894", tipo: "ORGANICO", points: 2500 },
 ];
 
 async function generateImage(code) {

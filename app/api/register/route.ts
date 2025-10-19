@@ -6,13 +6,12 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 const JWT_SECRET = process.env.JWT_SECRET || "supersecreto";
-const ADMIN_KEY = process.env.ADMIN_KEY || "miclavesupersecreta"; // Clave para crear usuarios admin
+const ADMIN_KEY = process.env.ADMIN_KEY || "miclavesupersecreta"; 
 
 export async function POST(req: Request) {
   try {
     const { name, email, username, password, phone, adminKey } = await req.json();
 
-    // Validaciones básicas
     if (!name || !email || !username || !password || !phone) {
       return NextResponse.json(
         { success: false, error: "Todos los campos son obligatorios" },
@@ -34,7 +33,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verificar si username o email ya existen
     const existingUser = await prisma.user.findUnique({ where: { username } });
     if (existingUser) {
       return NextResponse.json(
@@ -51,7 +49,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validar clave de admin
     let role: "USER" | "ADMIN" = "USER";
     if (adminKey) {
       if (adminKey !== ADMIN_KEY) {
@@ -63,25 +60,21 @@ export async function POST(req: Request) {
       role = "ADMIN";
     }
 
-    // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Crear usuario en la base de datos incluyendo phone
     const newUser = await prisma.user.create({
       data: { username, password: hashedPassword, email, name, role, phone },
     });
 
-    // Generar JWT
     const token = jwt.sign(
       { id: newUser.id, username: newUser.username, role: newUser.role },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Respuesta exitosa
     return NextResponse.json({ success: true, token });
   } catch (err: any) {
-    // Manejo de errores de Prisma (constraint único)
+  
     if (err.code === "P2002") {
       const target = (err.meta?.target as string[]).join(", ");
       return NextResponse.json(

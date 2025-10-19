@@ -65,7 +65,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
   }
 
   const menuItems = [
-    { title: "Solicitar Código de Validación", description: "Generar código para validar pagos", icon: Shield, color: BUTTON_COLOR, action: () => setCurrentScreen("validation") },
     { title: "Ver Puntos de Reciclaje", description: "Ubica los puntos de reciclaje cercanos", icon: MapPin, color: BUTTON_COLOR, action: () => setCurrentScreen("map") },
     { title: "Cupones Disponibles", description: "Ver cupones activos y promociones", icon: Ticket, color: BUTTON_COLOR, badge: "3 nuevos", action: () => console.log("Ver cupones disponibles") },
     { title: "Cupones Canjeados", description: "Historial de cupones utilizados", icon: CheckCircle, color: BUTTON_COLOR, action: () => console.log("Ver cupones canjeados") },
@@ -74,7 +73,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
     { title: "Mi Billetera", description: "Gestionar saldo y métodos de pago", icon: Wallet, color: BUTTON_COLOR, action: () => console.log("Abrir billetera") },
   ]
 
-  // Iniciales del usuario
   const initials = userName ? userName.split(" ").map(s => s[0]).slice(0,2).join("").toUpperCase() : "EF"
 
   return (

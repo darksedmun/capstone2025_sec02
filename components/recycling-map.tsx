@@ -23,7 +23,6 @@ export default function RecyclingMap({ onBack, addPoints }: RecyclingMapProps) {
   const [showScanner, setShowScanner] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null)
 
-  // 🌍 Inicializar mapa Leaflet
   useEffect(() => {
     if (!mapContainerRef.current) return
     mapContainerRef.current.style.width = "100%"
@@ -66,7 +65,6 @@ export default function RecyclingMap({ onBack, addPoints }: RecyclingMapProps) {
     }
   }, [])
 
-  // 📷 Escaneo QR
   useEffect(() => {
     if (showScanner && videoRef.current) {
       scannerRef.current = new QrScanner(
@@ -97,7 +95,7 @@ export default function RecyclingMap({ onBack, addPoints }: RecyclingMapProps) {
 
             if (res.ok && data.success) {
               setMessage({ text: "¡Reciclaje registrado correctamente!", type: "success" })
-              if (addPoints) addPoints(data.pointsAdded || 50) // Si la API no devuelve puntos
+              if (addPoints) addPoints(data.pointsAdded || 50) 
             } else {
               setMessage({ text: data.error || "Error al registrar reciclaje.", type: "error" })
             }
@@ -119,7 +117,6 @@ export default function RecyclingMap({ onBack, addPoints }: RecyclingMapProps) {
     }
   }, [showScanner, addPoints])
 
-  // 🔍 Funciones de control del mapa
   const zoomIn = () => mapRef.current?.zoomIn()
   const zoomOut = () => mapRef.current?.zoomOut()
 

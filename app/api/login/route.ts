@@ -17,7 +17,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Buscar usuario por username
     const user = await prisma.user.findUnique({ where: { username } });
     if (!user) {
       return NextResponse.json(
@@ -26,7 +25,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validar contraseña
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       return NextResponse.json(
@@ -35,7 +33,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Generar JWT
     const token = jwt.sign(
       { id: user.id, username: user.username },
       JWT_SECRET,
@@ -44,7 +41,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, token });
   } catch (err) {
-    // ✅ Evita mostrar errores en consola cuando NODE_ENV === 'test'
+  
     if (process.env.NODE_ENV !== "test") {
       console.error(err);
     }

@@ -11,6 +11,7 @@ const BUTTON_TEXT_COLOR = "white"
 export default function ResetPasswordForm() {
   const router = useRouter()
   const [username, setUsername] = useState("")
+  const [oldPassword, setOldPassword] = useState("") 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [success, setSuccess] = useState("")
@@ -20,7 +21,7 @@ export default function ResetPasswordForm() {
     setError("")
     setSuccess("")
 
-    if (!username || !password || !confirmPassword) {
+    if (!username || !oldPassword || !password || !confirmPassword) {
       setError("Todos los campos son obligatorios")
       return
     }
@@ -34,7 +35,7 @@ export default function ResetPasswordForm() {
       const res = await fetch("/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, oldPassword, password, confirmPassword }),
       })
 
       const data = await res.json()
@@ -42,13 +43,10 @@ export default function ResetPasswordForm() {
       if (data.success) {
         setSuccess("Contraseña cambiada con éxito")
         setUsername("")
+        setOldPassword("")
         setPassword("")
         setConfirmPassword("")
-
-        // Redirigir al login después de 1.5 segundos
-        setTimeout(() => {
-          router.push("/login")
-        }, 1500)
+        setTimeout(() => router.push("/login"), 1500)
       } else {
         setError(data.error || "Error al cambiar la contraseña")
       }
@@ -76,6 +74,14 @@ export default function ResetPasswordForm() {
 
           <input
             type="password"
+            placeholder="Contraseña actual"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          />
+
+          <input
+            type="password"
             placeholder="Nueva contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -84,7 +90,7 @@ export default function ResetPasswordForm() {
 
           <input
             type="password"
-            placeholder="Confirmar contraseña"
+            placeholder="Confirmar nueva contraseña"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-2 border rounded-md"

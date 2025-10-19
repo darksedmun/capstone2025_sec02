@@ -28,13 +28,11 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       const data = await res.json()
 
       if (res.ok && data.success) {
-        // Guardar el token en localStorage (ejemplo)
+        
         localStorage.setItem("token", data.token)
 
-        // Llamar al callback
         onLoginSuccess()
 
-        // Ir al menú
         router.push("/payment-menu")
       } else {
         setError(data.error || "Error al iniciar sesión")

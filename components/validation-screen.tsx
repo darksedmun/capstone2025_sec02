@@ -31,7 +31,6 @@ export const ValidationScreen: React.FC<ValidationScreenProps> = ({ onBack }) =>
   const [error, setError] = useState("")
   const [step, setStep] = useState<"code" | "success">("code")
 
-  // Countdown y renovación automática de código
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {

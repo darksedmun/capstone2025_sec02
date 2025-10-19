@@ -40,12 +40,11 @@ export async function POST(req: Request) {
     if (qr.used) return errorResponse("QR ya usado", 400);
 
     const pointsMap: Record<string, number> = {
-      plastico: 300,
-      vidrio: 150,
-      papel: 500,
-      organico: 250,
-      otro: 130,
-      generico: 50,
+      plastico: 1300,
+      vidrio: 1500,
+      papel: 2500,
+      metal: 2000,
+      organico: 2500,
     };
     const pointsToAdd = qr.tipo ? pointsMap[qr.tipo.toLowerCase()] || 50 : 50;
 
