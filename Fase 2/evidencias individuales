@@ -1,1 +1,12 @@
+4.2 Reflections
+Elías
 
+Working with PostgreSQL brought a deeper understanding of relational data modeling and the importance of schema design. The experience reinforced the idea that flexibility must coexist with structure — while NoSQL allowed rapid prototyping, SQL enforces discipline through explicit relationships. This shift encouraged more precise thinking about data dependencies and transactions, aligning the technical mindset with real-world engineering standards.
+
+Ignacio
+
+The process of adapting the system to PostgreSQL emphasized the value of analytical thinking and proactive risk detection. Transitioning from Firestore to a relational model required rethinking data flows, optimizing queries, and understanding how each design choice impacts long-term performance. This adaptation strengthened problem-solving and teamwork under changing conditions — an essential competency in modern software engineering.
+
+Mauricio
+
+Migrating to PostgreSQL transformed the project into a more professional and technically robust platform. It highlighted the importance of aligning technical design decisions with security and business logic considerations. Personally, this experience reaffirmed that a developer’s role extends beyond writing code — it involves safeguarding data integrity, anticipating scalability challenges, and ensuring that every technical choice contributes to the sustainability of the product.
