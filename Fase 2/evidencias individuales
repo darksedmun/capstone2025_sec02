@@ -1,3 +1,33 @@
+4.1 Conclusions
+For Ignacio (The Analytical/Strategic)
+Subject: Initial Phase Conclusion: Infrastructure in Production and Strategic Pivot to Security (Activity 5)
+
+The Initial Development Phase of EcoFinder has concluded successfully, establishing a robust technical foundation. The most critical achievement is the implementation of real-time data persistence using PostgreSQL, ensuring the integrity and immediacy of the Dynamic Map (Leaflet.js). Furthermore, the completion of the Rewards Catalog fully validates our core value proposition.
+
+However, this progress has revealed an immediate strategic need to reprioritize resources towards security. The vulnerability of user point balances and transactional integrity demands that we advance and prioritize Activity 5: PostgreSQL Security Policies/Rules. This pivot is paramount to ensure the project meets the highest quality and security indicators required by the discipline. In short: Infrastructure OK, the focus is now on hardening system integrity.
+
+For Elías (The Direct/Executive)
+Subject: EcoFinder: Infrastructure Complete. CRITICAL Next Step: Security (PostgreSQL Rules).
+
+EcoFinder’s core infrastructure stage is completed.
+
+Key Achievement: PostgreSQL integration ensures our recycling map is always up-to-date in real time.
+
+Value Confirmed: The Rewards Catalog interface is ready, validating the project's core.
+
+However, infrastructure success mandates an immediate priority shift. Security is now the weak spot. We must Pivot: Move all available resources to Activity 5 (PostgreSQL Security Policies/Rules). This is fundamental for protecting user points and ensuring transactional integrity, a non-negotiable quality requirement. The system is working; we must now secure it.
+
+For Mauricio (The Collaborative/Detailed)
+Subject: Great Progress on EcoFinder! Core Infrastructure is Ready, But We Need a Quick Turn to Security.
+
+Excellent work, team! We've reached the end of EcoFinder's initial infrastructure development phase with solid results.
+
+We achieved two key goals:
+
+Dynamic, Real-Time Map: We implemented PostgreSQL for data persistence. This means our Leaflet.js map will always display recycling points instantly, which is a major technical accomplishment.
+
+Value Validation: The Rewards Catalog interface is complete, which concretely demonstrates how we will reward our users.
+
 4.2 Reflections
 Elías
 
@@ -5,7 +35,7 @@ Working with PostgreSQL brought a deeper understanding of relational data modeli
 
 Ignacio
 
-The process of adapting the system to PostgreSQL emphasized the value of analytical thinking and proactive risk detection. Transitioning from Firestore to a relational model required rethinking data flows, optimizing queries, and understanding how each design choice impacts long-term performance. This adaptation strengthened problem-solving and teamwork under changing conditions — an essential competency in modern software engineering.
+The process of adapting the system to PostgreSQL emphasized the value of analytical thinking and proactive risk detection. Transitioning from PostgreSQL to a relational model required rethinking data flows, optimizing queries, and understanding how each design choice impacts long-term performance. This adaptation strengthened problem-solving and teamwork under changing conditions — an essential competency in modern software engineering.
 
 Mauricio
 
