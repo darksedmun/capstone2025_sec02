@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecreto";
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ success: false, error: message }, { status });
 }
+
 function verifyToken(token: string): { id: number } | null {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
@@ -46,29 +47,33 @@ export async function POST(req: Request) {
       metal: 2000,
       organico: 2500,
     };
-    const pointsToAdd = qr.tipo ? pointsMap[qr.tipo.toLowerCase()] || 50 : 50;
+    const material = (qr.tipo || "material").toString();
+    const pointsToAdd = qr.tipo ? pointsMap[material.toLowerCase()] || 50 : 50;
 
-    await prisma.qRCode.update({
-      where: { id: qr.id },
-      data: { used: true, usedAt: new Date(), usedBy: userId },
-    });
+    const [_, updatedUser] = await prisma.$transaction([
+      prisma.qRCode.update({
+        where: { id: qr.id },
+        data: { used: true, usedAt: new Date(), usedBy: userId },
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: { points: { increment: pointsToAdd } },
+        select: { id: true, points: true, email: true, name: true },
+      }),
+      prisma.reciclaje.create({
+        data: { userId, tipo: qr.tipo as any, points: pointsToAdd },
+      }),
+      prisma.pointTransaction.create({
+        data: {
+          userId,
+          type: "earned",
+          points: pointsToAdd,
+          description: `Ganaste ${pointsToAdd} puntos por reciclar ${material}`,
+        },
+      }),
+    ]);
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { points: { increment: pointsToAdd } },
-    });
-
-    await prisma.reciclaje.create({
-      data: {
-        userId,
-        tipo: qr.tipo as any,
-        points: pointsToAdd,
-      },
-    });
-
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    if (user?.email) {
+    if (updatedUser?.email) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -79,20 +84,24 @@ export async function POST(req: Request) {
 
       const mailOptions = {
         from: `"EcoFinder" <${process.env.GMAIL_USER}>`,
-        to: user.email,
-        subject: `¡Gracias por reciclar, ${user.name || "usuario"}! ♻️`,
-        text: `Has reciclado ${qr.tipo || "material"} y ganaste ${pointsToAdd} puntos. 
+        to: updatedUser.email,
+        subject: `¡Gracias por reciclar, ${updatedUser.name || "usuario"}! ♻️`,
+        text: `Has reciclado ${material} y ganaste ${pointsToAdd} puntos.
 Tu total acumulado es de ${updatedUser.points} puntos. ¡Gracias por ayudar al planeta 🌍!`,
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`Correo enviado a ${user.email}`);
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Correo enviado a ${updatedUser.email}`);
+      } catch (e) {
+        console.warn("No se pudo enviar el correo:", e);
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: `Reciclaje de ${qr.tipo || "desconocido"} registrado y correo enviado correctamente`,
-      tipo: qr.tipo || "desconocido",
+      message: `Reciclaje de ${material} registrado correctamente`,
+      tipo: material,
       pointsAdded: pointsToAdd,
       totalPoints: updatedUser.points,
     });
