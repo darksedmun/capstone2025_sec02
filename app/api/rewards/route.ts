@@ -43,9 +43,12 @@ export async function GET(req: Request) {
       canRedeem: userPoints >= r.points,
     }))
 
+    const newRewardsCount = rewardsWithStatus.filter((r) => r.canRedeem).length
+
     return NextResponse.json({
       rewards: rewardsWithStatus,
       userPoints,
+      newRewardsCount, 
     })
   } catch (error) {
     console.error("Error al obtener recompensas:", error)
