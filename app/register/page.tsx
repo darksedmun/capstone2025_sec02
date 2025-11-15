@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const [registered, setRegistered] = useState(false)
 
   if (registered) {
-    // 👇 después de registrarse, lo mandamos al login
+   
     return <LoginForm onLoginSuccess={() => console.log("logueado")} />
   }
 

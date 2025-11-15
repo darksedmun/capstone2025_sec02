@@ -2,7 +2,11 @@
 
 import { useRef, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 import QrScanner from "qr-scanner"
+
+const BUTTON_COLOR = "#0cb7f2"
+const BUTTON_TEXT_COLOR = "white"
 
 export default function QrScannerScreen({
   onBack,
@@ -76,12 +80,26 @@ export default function QrScannerScreen({
 
   return (
     <div className="relative w-full h-screen flex flex-col items-center justify-center bg-black/80">
-      <p className="text-white mb-4 text-lg font-medium">Escanea el código QR</p>
-      <video ref={videoRef} style={{ width: "90%", maxWidth: "400px", borderRadius: "8px" }} />
+      <div className="absolute top-6 left-6 flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onBack}
+          style={{ backgroundColor: BUTTON_COLOR, color: BUTTON_TEXT_COLOR }}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+
+      <video
+        ref={videoRef}
+        style={{ width: "90%", maxWidth: "400px", borderRadius: "8px" }}
+      />
+
       <Button
         onClick={onBack}
         className="mt-6 w-[200px]"
-        style={{ backgroundColor: "#0cb7f2", color: "white" }}
+        style={{ backgroundColor: BUTTON_COLOR, color: BUTTON_TEXT_COLOR }}
       >
         Cancelar
       </Button>

@@ -42,13 +42,11 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
   const refreshUserData = async () => {
     const token = localStorage.getItem("token")
     if (!token) return
-
     try {
       const res = await fetch("/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
-
       setPoints(data.points ?? 0)
       setUserName(data.name ?? null)
       setChangeThisMonth(data.changeThisMonth ?? 0)
@@ -60,7 +58,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (!token) return
-
     const fetchNewRewards = async () => {
       try {
         const res = await fetch("/api/rewards", {
@@ -74,7 +71,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
         console.error("Error al obtener recompensas:", err)
       }
     }
-
     fetchNewRewards()
   }, [])
 
@@ -120,8 +116,7 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
     )
   }
 
-  if (currentScreen === "redeemed")
-    return <RedeemedCoupons onBack={() => setCurrentScreen("menu")} />
+  if (currentScreen === "redeemed") return <RedeemedCoupons onBack={() => setCurrentScreen("menu")} />
 
   if (currentScreen === "map")
     return (
@@ -134,8 +129,7 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
       />
     )
 
-  if (currentScreen === "points")
-    return <PointsHistory onBack={() => setCurrentScreen("menu")} />
+  if (currentScreen === "points") return <PointsHistory onBack={() => setCurrentScreen("menu")} />
 
   if (currentScreen === "scanner")
     return (
@@ -198,7 +192,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-3xl font-bold" style={{ color: "black" }}>
@@ -233,9 +226,7 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
                 </span>
               )}
             </Button>
-            {showNotifications && (
-              <NotificationsPanel onClose={() => setShowNotifications(false)} />
-            )}
+            {showNotifications && <NotificationsPanel onClose={() => setShowNotifications(false)} />}
           </div>
 
           <Button
@@ -250,7 +241,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
         </div>
       </div>
 
-      {/* Card de puntos */}
       <Card className="mb-8 border-0 text-primary-foreground" style={{ backgroundColor: BUTTON_COLOR }}>
         <CardHeader>
           <CardTitle className="text-lg font-medium">Puntos Disponibles</CardTitle>
@@ -282,7 +272,6 @@ export function PaymentMenu({ onLogout }: PaymentMenuProps) {
         </CardContent>
       </Card>
 
-      {/* Menú principal */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {menuItems.map((item) => (
           <Card

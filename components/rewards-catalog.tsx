@@ -17,11 +17,7 @@ interface Reward {
   image?: string
 }
 
-export default function RewardsCatalog({
-  onBack,
-}: {
-  onBack: () => void
-}) {
+export default function RewardsCatalog({ onBack }: { onBack: () => void }) {
   const [rewards, setRewards] = useState<Reward[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -48,7 +44,6 @@ export default function RewardsCatalog({
         setLoading(false)
       }
     }
-
     fetchData()
   }, [])
 
@@ -60,7 +55,6 @@ export default function RewardsCatalog({
   const handleRedeem = async (reward: Reward) => {
     const token = localStorage.getItem("token")
     if (!token) return showMessage("Debes iniciar sesión para canjear.", "error")
-
     if (userPoints < reward.points) return showMessage("No tienes suficientes puntos 😢", "error")
 
     setRedeeming(reward.id)
@@ -77,7 +71,7 @@ export default function RewardsCatalog({
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Error al canjear")
 
-      showMessage(`🎉 ¡Canje exitoso!`, "success")
+      showMessage("🎉 ¡Canje exitoso!", "success")
       setUserPoints((prev) => prev - reward.points)
     } catch (err: any) {
       showMessage(err.message || "Error al canjear", "error")
@@ -87,10 +81,10 @@ export default function RewardsCatalog({
   }
 
   if (loading) return <p className="text-center mt-10 text-gray-600">Cargando cupones...</p>
+  if (error) return <p className="text-center mt-10 text-red-600">{error}</p>
 
   return (
     <div className="relative min-h-screen bg-background p-4">
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button
           variant="ghost"
@@ -107,7 +101,6 @@ export default function RewardsCatalog({
         </div>
       </div>
 
-      {/* Grid de cupones */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {rewards.map((reward) => {
           const canRedeem = userPoints >= reward.points
@@ -136,6 +129,7 @@ export default function RewardsCatalog({
 
               <CardContent className="flex flex-col justify-between h-full">
                 <p className="text-gray-700 mb-3 min-h-[40px]">{reward.description}</p>
+
                 <div className="flex justify-between items-center mt-auto">
                   <span className="font-semibold text-gray-800">{reward.points} pts</span>
 
@@ -157,12 +151,10 @@ export default function RewardsCatalog({
                       size="sm"
                       disabled
                       className="opacity-70"
-                      style={{
-                        backgroundColor: "#999",
-                        color: "white",
-                      }}
+                      style={{ backgroundColor: "#999", color: "white" }}
                     >
-                      <Lock className="h-4 w-4 mr-2" /> Bloqueado
+                      <Lock className="h-4 w-4 mr-2" />
+                      Bloqueado
                     </Button>
                   )}
                 </div>
@@ -172,14 +164,11 @@ export default function RewardsCatalog({
         })}
       </div>
 
-      {/* Mensaje flotante estilo QR */}
       {message && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-md z-[2000]">
           <p
             className="text-center font-medium"
-            style={{
-              color: message.type === "success" ? "#0cb7f2" : "#ef4444",
-            }}
+            style={{ color: message.type === "success" ? "#0cb7f2" : "#ef4444" }}
           >
             {message.text}
           </p>

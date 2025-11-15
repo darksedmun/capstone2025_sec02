@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -9,6 +10,8 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ onRegisterSuccess }: RegisterFormProps) {
+  const router = useRouter()
+
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [username, setUsername] = useState("")
@@ -17,6 +20,14 @@ export default function RegisterForm({ onRegisterSuccess }: RegisterFormProps) {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isActive) router.push("/login")
+    }, 8000)
+    return () => clearTimeout(timer)
+  }, [isActive, router])
 
   const handleRegister = async () => {
     setError("")
@@ -75,54 +86,75 @@ export default function RegisterForm({ onRegisterSuccess }: RegisterFormProps) {
             Registro de Usuario
           </CardTitle>
         </CardHeader>
+
         <CardContent className="flex flex-col gap-4">
           <input
             className="border rounded-md p-2"
             placeholder="Nombre completo"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value)
+              setIsActive(true)
+            }}
           />
+
           <input
             className="border rounded-md p-2"
             placeholder="Correo electrónico"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setIsActive(true)
+            }}
           />
+
           <input
             className="border rounded-md p-2"
             placeholder="Usuario"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value)
+              setIsActive(true)
+            }}
           />
+
           <input
             className="border rounded-md p-2"
             placeholder="Número de teléfono"
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value)
+              setIsActive(true)
+            }}
           />
+
           <input
             className="border rounded-md p-2"
             type="password"
             placeholder="Contraseña"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setIsActive(true)
+            }}
           />
+
           <input
             className="border rounded-md p-2"
             type="password"
             placeholder="Confirmar contraseña"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value)
+              setIsActive(true)
+            }}
           />
 
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           {success && (
-            <p
-              className="text-sm font-medium text-center"
-              style={{ color: "#0cb7f2" }}
-            >
+            <p className="text-sm font-medium text-center" style={{ color: "#0cb7f2" }}>
               {success}
             </p>
           )}

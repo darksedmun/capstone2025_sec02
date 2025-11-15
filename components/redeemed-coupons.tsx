@@ -32,6 +32,7 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
         })
 
         if (!res.ok) throw new Error("Error al obtener los cupones canjeados")
+
         const data = await res.json()
         setRedeemed(data.redeemed ?? [])
 
@@ -69,7 +70,6 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="relative min-h-screen bg-background p-4">
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button
           variant="ghost"
@@ -84,7 +84,6 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
         </h1>
       </div>
 
-      {/* Lista de canjeados */}
       {redeemed.length === 0 ? (
         <p className="text-gray-600 text-center mt-10">
           No tienes cupones canjeados todavía.
@@ -113,6 +112,7 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
                   <CardDescription>{reward.store}</CardDescription>
                 </div>
               </CardHeader>
+
               <CardContent className="flex flex-col justify-between h-full">
                 <p className="text-gray-700 mb-2">
                   Canjeado el{" "}
@@ -120,13 +120,13 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
                     {new Date(reward.redeemedAt).toLocaleDateString("es-CL")}
                   </span>
                 </p>
+
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-800">
                     {reward.points} pts
                   </span>
-                  <span className="inline-flex items-center" aria-label="Canje exitoso">
-                    <CheckCircle className="text-green-500" />
-                  </span>
+
+                  <CheckCircle className="text-green-500" />
                 </div>
               </CardContent>
             </Card>
@@ -134,7 +134,6 @@ export default function RedeemedCoupons({ onBack }: { onBack: () => void }) {
         </div>
       )}
 
-      {/* Mensaje estilo QR */}
       {message && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-md z-[2000]">
           <p

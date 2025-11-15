@@ -23,7 +23,6 @@ export default function PointsHistory({ onBack }: { onBack: () => void }) {
     const fetchHistory = async () => {
       const token = localStorage.getItem("token")
       if (!token) return
-
       const res = await fetch("/api/points-history", {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -31,7 +30,6 @@ export default function PointsHistory({ onBack }: { onBack: () => void }) {
       setMovements(data.movements ?? [])
       setLoading(false)
     }
-
     fetchHistory()
   }, [])
 
@@ -42,7 +40,6 @@ export default function PointsHistory({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button
           variant="ghost"
@@ -57,7 +54,6 @@ export default function PointsHistory({ onBack }: { onBack: () => void }) {
         </h1>
       </div>
 
-      {/* Movements */}
       {movements.length === 0 ? (
         <p className="text-center text-gray-600 mt-10">
           Aún no tienes movimientos registrados.
@@ -91,7 +87,7 @@ export default function PointsHistory({ onBack }: { onBack: () => void }) {
                   <span
                     className="font-semibold"
                     style={{
-                      color: m.type === "earned" ? BUTTON_COLOR : "#dc2626", // rojo tailwind-600
+                      color: m.type === "earned" ? BUTTON_COLOR : "#dc2626",
                     }}
                   >
                     {m.type === "earned" ? "+" : "-"}

@@ -10,18 +10,27 @@ import bcrypt from "bcrypt"
 jest.mock("@prisma/client", () => {
   const mockFindUnique = jest.fn()
   const mockUpdate = jest.fn()
+  const mockDisconnect = jest.fn().mockResolvedValue(undefined)
+
   return {
-    PrismaClient: jest.fn(() => ({
+    PrismaClient: jest.fn().mockImplementation(() => ({
       user: {
         findUnique: mockFindUnique,
         update: mockUpdate,
       },
+      $disconnect: mockDisconnect,
     })),
+    __mocks: {
+      mockFindUnique,
+      mockUpdate,
+      mockDisconnect,
+    },
   }
 })
 
 jest.mock("bcrypt", () => ({
-  hash: jest.fn(() => Promise.resolve("hashedPassword")),
+  compare: jest.fn(),
+  hash: jest.fn().mockResolvedValue("hashedPassword"),
 }))
 
 jest.mock("next/server", () => ({
@@ -30,12 +39,17 @@ jest.mock("next/server", () => ({
   },
 }))
 
+const { __mocks } = jest.requireMock("@prisma/client")
+const { mockFindUnique, mockUpdate } = __mocks as {
+  mockFindUnique: jest.Mock
+  mockUpdate: jest.Mock
+}
+
 describe("POST /api/reset-password", () => {
   const mockPrisma = new PrismaClient() as any
   let originalConsoleError: typeof console.error
 
   beforeAll(() => {
-    
     originalConsoleError = console.error
     console.error = jest.fn()
   })
@@ -50,7 +64,12 @@ describe("POST /api/reset-password", () => {
 
   it("debería devolver 400 si faltan campos", async () => {
     const req = {
-      json: async () => ({ username: "Mauricio", password: "" }),
+      json: async () => ({
+        username: "Mauricio",
+        oldPassword: "",
+        password: "1234",
+        confirmPassword: "1234",
+      }),
     } as Request
 
     await POST(req)
@@ -65,8 +84,9 @@ describe("POST /api/reset-password", () => {
     const req = {
       json: async () => ({
         username: "Mauricio",
+        oldPassword: "oldpass",
         password: "1234",
-        confirmPassword: "4321",
+        confirmPassword: "9999",
       }),
     } as Request
 
@@ -84,6 +104,7 @@ describe("POST /api/reset-password", () => {
     const req = {
       json: async () => ({
         username: "Mauricio",
+        oldPassword: "oldpass",
         password: "1234",
         confirmPassword: "1234",
       }),
@@ -97,14 +118,20 @@ describe("POST /api/reset-password", () => {
     )
   })
 
-  it("debería actualizar la contraseña correctamente", async () => {
-    const fakeUser = { id: 1, username: "Mauricio" }
+  it("debería devolver 401 si la contraseña actual es incorrecta", async () => {
+    const fakeUser = {
+      id: 1,
+      username: "Mauricio",
+      password: "hashedOldPass",
+    }
+
     mockPrisma.user.findUnique.mockResolvedValue(fakeUser)
-    mockPrisma.user.update.mockResolvedValue({ ...fakeUser, password: "hashedPassword" })
+    ;(bcrypt.compare as jest.Mock).mockResolvedValue(false)
 
     const req = {
       json: async () => ({
         username: "Mauricio",
+        oldPassword: "wrongPass",
         password: "1234",
         confirmPassword: "1234",
       }),
@@ -112,11 +139,47 @@ describe("POST /api/reset-password", () => {
 
     await POST(req)
 
-    expect(bcrypt.hash).toHaveBeenCalledWith("1234", 10)
+    expect(bcrypt.compare).toHaveBeenCalledWith("wrongPass", "hashedOldPass")
+
+    expect(NextResponse.json).toHaveBeenCalledWith(
+      { success: false, error: "La contraseña actual es incorrecta" },
+      { status: 401 }
+    )
+  })
+
+  it("debería actualizar la contraseña correctamente", async () => {
+    const fakeUser = {
+      id: 1,
+      username: "Mauricio",
+      password: "hashedOldPass",
+    }
+
+    mockPrisma.user.findUnique.mockResolvedValue(fakeUser)
+    ;(bcrypt.compare as jest.Mock).mockResolvedValue(true)
+
+    mockPrisma.user.update.mockResolvedValue({
+      ...fakeUser,
+      password: "hashedPassword",
+    })
+
+    const req = {
+      json: async () => ({
+        username: "Mauricio",
+        oldPassword: "oldpass",
+        password: "nueva123",
+        confirmPassword: "nueva123",
+      }),
+    } as Request
+
+    await POST(req)
+
+    expect(bcrypt.hash).toHaveBeenCalledWith("nueva123", 10)
+
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: { password: "hashedPassword" },
     })
+
     expect(NextResponse.json).toHaveBeenCalledWith({ success: true })
   })
 
@@ -126,6 +189,7 @@ describe("POST /api/reset-password", () => {
     const req = {
       json: async () => ({
         username: "Mauricio",
+        oldPassword: "oldpass",
         password: "1234",
         confirmPassword: "1234",
       }),

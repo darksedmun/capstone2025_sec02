@@ -5,7 +5,6 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
-// Importa el mapa de forma dinámica SIN SSR
 const RecyclingMap = dynamic(() => import("@/components/recycling-map"), { ssr: false })
 
 interface RecyclingMapPageProps {

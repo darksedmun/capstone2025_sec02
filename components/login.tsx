@@ -28,16 +28,13 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       const data = await res.json()
 
       if (res.ok && data.success) {
-        
         localStorage.setItem("token", data.token)
-
         onLoginSuccess()
-
         router.push("/payment-menu")
       } else {
         setError(data.error || "Error al iniciar sesión")
       }
-    } catch (err) {
+    } catch {
       setError("Error de conexión con el servidor")
     }
   }
@@ -72,7 +69,6 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
               Ingresar
             </Button>
 
-            {/* Olvidaste tu contraseña debajo del botón ingresar */}
             <p className="text-center text-sm mt-2">
               ¿Olvidaste tu contraseña?{" "}
               <span
@@ -83,7 +79,6 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
               </span>
             </p>
 
-            {/* Registro */}
             <p className="text-center text-sm mt-2">
               ¿No tienes cuenta?{" "}
               <span
@@ -94,7 +89,6 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
               </span>
             </p>
 
-            {/* Contacto / Colaboración */}
             <p className="text-center text-sm mt-2">
               ¿Deseas colaborar?{" "}
               <span
@@ -108,7 +102,6 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
         </CardContent>
       </Card>
 
-      {/* Footer */}
       <p className="text-center text-sm text-gray-500 mt-6">
         Todos los derechos reservados por EcoFinder © {new Date().getFullYear()}
       </p>

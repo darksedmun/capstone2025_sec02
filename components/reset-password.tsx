@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,12 +10,22 @@ const BUTTON_TEXT_COLOR = "white"
 
 export default function ResetPasswordForm() {
   const router = useRouter()
+
   const [username, setUsername] = useState("")
-  const [oldPassword, setOldPassword] = useState("") 
+  const [oldPassword, setOldPassword] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isActive) router.push("/login")
+    }, 8000)
+
+    return () => clearTimeout(timer)
+  }, [isActive, router])
 
   const handleSubmit = async () => {
     setError("")
@@ -46,6 +56,7 @@ export default function ResetPasswordForm() {
         setOldPassword("")
         setPassword("")
         setConfirmPassword("")
+
         setTimeout(() => router.push("/login"), 1500)
       } else {
         setError(data.error || "Error al cambiar la contraseña")
@@ -63,12 +74,16 @@ export default function ResetPasswordForm() {
             Cambiar Contraseña
           </CardTitle>
         </CardHeader>
+
         <CardContent className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Nombre de usuario"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value)
+              setIsActive(true)
+            }}
             className="w-full p-2 border rounded-md"
           />
 
@@ -76,7 +91,10 @@ export default function ResetPasswordForm() {
             type="password"
             placeholder="Contraseña actual"
             value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
+            onChange={(e) => {
+              setOldPassword(e.target.value)
+              setIsActive(true)
+            }}
             className="w-full p-2 border rounded-md"
           />
 
@@ -84,7 +102,10 @@ export default function ResetPasswordForm() {
             type="password"
             placeholder="Nueva contraseña"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setIsActive(true)
+            }}
             className="w-full p-2 border rounded-md"
           />
 
@@ -92,7 +113,10 @@ export default function ResetPasswordForm() {
             type="password"
             placeholder="Confirmar nueva contraseña"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value)
+              setIsActive(true)
+            }}
             className="w-full p-2 border rounded-md"
           />
 

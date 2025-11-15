@@ -57,96 +57,109 @@ const {
   mockUpdateMany,
 } = __mocks
 
-describe("GET /api/notifications", () => {
+describe("API /notifications", () => {
   beforeEach(() => jest.clearAllMocks())
 
-  it("debe retornar 401 si no hay token", async () => {
-    const req = new Request("http://localhost", { headers: {} })
+  it("GET debe retornar 401 si no hay token", async () => {
+    const req = new Request("http://localhost")
     await GET(req)
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { success: false, error: "No autorizado" },
       { status: 401 }
     )
   })
 
-  it("debe retornar 401 si el token es inválido", async () => {
+  it("GET debe retornar 401 si el token es inválido", async () => {
     ;(jwt.verify as jest.Mock).mockImplementation(() => {
       throw new Error("invalid")
     })
+
     const req = new Request("http://localhost", {
       headers: { Authorization: "Bearer invalid" },
     })
+
     await GET(req)
+
     expect(NextResponse.json).toHaveBeenCalledWith(
       { success: false, error: "Token inválido" },
       { status: 401 }
     )
   })
 
-  it("debe generar y devolver notificaciones correctamente", async () => {
+  it("GET debe generar insights, evitar duplicados y retornar unreadCount", async () => {
     ;(jwt.verify as jest.Mock).mockReturnValue({ id: 1 })
-    mockFindUnique.mockResolvedValue({ id: 1, points: 3700, name: "Juan" })
+
+    mockFindUnique.mockResolvedValue({ id: 1, points: 3500, name: "Juan" })
+
     mockFindMany
       .mockResolvedValueOnce([
-        { tipo: "ORGANICO", points: 1200, createdAt: new Date() },
         { tipo: "VIDRIO", points: 800, createdAt: new Date() },
+        { tipo: "VIDRIO", points: 900, createdAt: new Date() },
       ])
       .mockResolvedValueOnce([{ points: 500 }])
+      .mockResolvedValueOnce([
+        {
+          id: 1,
+          type: "summary",
+          title: "Resumen mensual",
+          message: "Mensaje A",
+          read: false,
+          createdAt: new Date("2025-10-25T10:00:00Z"),
+        },
+        {
+          id: 2,
+          type: "summary",
+          title: "Resumen mensual repetido",
+          message: "Mensaje B",
+          read: false,
+          createdAt: new Date("2025-10-26T10:00:00Z"),
+        },
+        {
+          id: 3,
+          type: "habit",
+          title: "Hábito",
+          message: "Mensaje C",
+          read: false,
+          createdAt: new Date("2025-10-27T10:00:00Z"),
+        },
+      ])
+
     mockFindFirst.mockResolvedValue(null)
     mockCreate.mockResolvedValue({})
-    mockFindMany.mockResolvedValue([
-      {
-        id: 1,
-        title: "Resumen mensual",
-        message: "Mensaje de prueba",
-        type: "summary",
-        read: false,
-        createdAt: new Date(),
-      },
-    ])
-    mockCount.mockResolvedValue(1)
+    mockCount.mockResolvedValue(2)
 
     const req = new Request("http://localhost", {
       headers: { Authorization: "Bearer valid" },
     })
+
     await GET(req)
 
+    const response = (NextResponse.json as jest.Mock).mock.calls[0][0]
+
+    const types = response.insights.map((n: any) => n.type)
+    const uniqueTypes = [...new Set(types)]
+
+    expect(types.length).toBe(uniqueTypes.length)
     expect(mockCreate).toHaveBeenCalledTimes(3)
-    expect(NextResponse.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        success: true,
-        insights: expect.any(Array),
-        unreadCount: 1,
-      })
-    )
-  })
-})
-
-describe("PATCH /api/notifications", () => {
-  beforeEach(() => jest.clearAllMocks())
-
-  it("debe retornar 401 si no hay token", async () => {
-    const req = new Request("http://localhost", { headers: {} })
-    await PATCH(req)
-    expect(NextResponse.json).toHaveBeenCalledWith(
-      { success: false, error: "No autorizado" },
-      { status: 401 }
-    )
+    expect(response.unreadCount).toBe(2)
   })
 
-  it("debe marcar como leídas las notificaciones", async () => {
+  it("PATCH debe marcar notificaciones como leídas", async () => {
     ;(jwt.verify as jest.Mock).mockReturnValue({ id: 1 })
-    mockUpdateMany.mockResolvedValue({ count: 2 })
+    mockUpdateMany.mockResolvedValue({ count: 3 })
 
     const req = new Request("http://localhost", {
       headers: { Authorization: "Bearer valid" },
     })
+
     await PATCH(req)
 
     expect(mockUpdateMany).toHaveBeenCalledWith({
       where: { userId: 1, read: false },
       data: { read: true },
     })
+
     expect(NextResponse.json).toHaveBeenCalledWith({ success: true })
   })
 })

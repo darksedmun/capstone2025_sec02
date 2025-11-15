@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,10 +12,21 @@ const BUTTON_COLOR = "#0cb7f2"
 const BUTTON_TEXT_COLOR = "white"
 
 export default function ContactScreen() {
+  const router = useRouter()
+
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle")
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isActive) router.push("/login")
+    }, 8000)
+
+    return () => clearTimeout(timer)
+  }, [isActive, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,8 +45,12 @@ export default function ContactScreen() {
       setName("")
       setEmail("")
       setMessage("")
+
+      setTimeout(() => {
+        router.push("/login")
+      }, 2000)
+
     } catch (err) {
-      console.error(err)
       setStatus("error")
     }
   }
@@ -53,7 +69,6 @@ export default function ContactScreen() {
 
         <CardContent className="flex flex-col gap-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Nombre */}
             <div>
               <Label htmlFor="name" className="mb-2 block">
                 Tu nombre
@@ -62,12 +77,14 @@ export default function ContactScreen() {
                 id="name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setIsActive(true)
+                }}
                 required
               />
             </div>
 
-            {/* Correo */}
             <div>
               <Label htmlFor="email" className="mb-2 block">
                 Tu correo
@@ -76,12 +93,14 @@ export default function ContactScreen() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setIsActive(true)
+                }}
                 required
               />
             </div>
 
-            {/* Mensaje */}
             <div>
               <Label htmlFor="message" className="mb-2 block">
                 Mensaje
@@ -89,25 +108,27 @@ export default function ContactScreen() {
               <Textarea
                 id="message"
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => {
+                  setMessage(e.target.value)
+                  setIsActive(true)
+                }}
                 className="h-32"
                 required
               />
             </div>
 
-            {/* Estado del envío */}
             {status === "success" && (
               <p className="text-center text-sm font-medium" style={{ color: BUTTON_COLOR }}>
-                ¡Mensaje enviado con éxito! Te contactaremos pronto.
+                ¡Mensaje enviado con éxito!
               </p>
             )}
+
             {status === "error" && (
               <p className="text-center text-sm text-red-500">
                 Ocurrió un error al enviar tu mensaje. Intenta nuevamente.
               </p>
             )}
 
-            {/* Botón */}
             <Button
               type="submit"
               className="w-full"

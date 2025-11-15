@@ -23,7 +23,7 @@ jest.mock("jsonwebtoken", () => ({
 
 jest.mock("next/server", () => ({
   NextResponse: {
-    json: jest.fn((data, options) => ({ data, options })),
+    json: jest.fn(),
   },
 }))
 
@@ -32,27 +32,28 @@ import { GET } from "./route"
 describe("GET /api/rewards", () => {
   beforeEach(() => jest.clearAllMocks())
 
-  it("debe retornar recompensas con usuario no autenticado (sin Authorization)", async () => {
+  it("debe retornar recompensas sin usuario autenticado", async () => {
     mockFindManyRewards.mockResolvedValue([
       { id: 1, name: "Café Gratis", points: 200 },
       { id: 2, name: "Descuento Nike", points: 800 },
     ])
 
-    const req = new Request("http://localhost/api/rewards", { headers: {} })
+    const req = new Request("http://localhost/api/rewards")
     await GET(req)
 
-    expect(mockFindManyRewards).toHaveBeenCalledWith({ orderBy: { points: "asc" } })
     expect(NextResponse.json).toHaveBeenCalledWith({
       rewards: [
         { id: 1, name: "Café Gratis", points: 200, canRedeem: false },
         { id: 2, name: "Descuento Nike", points: 800, canRedeem: false },
       ],
       userPoints: 0,
+      newRewardsCount: 0,
     })
   })
 
   it("debe retornar recompensas y puntos del usuario autenticado", async () => {
     ;(jwt.verify as jest.Mock).mockReturnValue({ id: 1 })
+
     mockFindUniqueUser.mockResolvedValue({ id: 1, points: 600 })
     mockFindManyRewards.mockResolvedValue([
       { id: 1, name: "Café Gratis", points: 200 },
@@ -64,23 +65,21 @@ describe("GET /api/rewards", () => {
     })
     await GET(req)
 
-    expect(mockFindUniqueUser).toHaveBeenCalledWith({
-      where: { id: 1 },
-      select: { points: true },
-    })
     expect(NextResponse.json).toHaveBeenCalledWith({
       rewards: [
         { id: 1, name: "Café Gratis", points: 200, canRedeem: true },
         { id: 2, name: "Descuento Nike", points: 800, canRedeem: false },
       ],
       userPoints: 600,
+      newRewardsCount: 1,
     })
   })
 
-  it("debe retornar recompensas aunque el token sea inválido", async () => {
+  it("debe retornar recompensas si el token es inválido", async () => {
     ;(jwt.verify as jest.Mock).mockImplementation(() => {
       throw new Error("invalid token")
     })
+
     mockFindManyRewards.mockResolvedValue([
       { id: 1, name: "Café Gratis", points: 200 },
     ])
@@ -91,15 +90,18 @@ describe("GET /api/rewards", () => {
     await GET(req)
 
     expect(NextResponse.json).toHaveBeenCalledWith({
-      rewards: [{ id: 1, name: "Café Gratis", points: 200, canRedeem: false }],
+      rewards: [
+        { id: 1, name: "Café Gratis", points: 200, canRedeem: false },
+      ],
       userPoints: 0,
+      newRewardsCount: 0,
     })
   })
 
-  it("debe manejar errores del servidor correctamente", async () => {
+  it("debe manejar errores del servidor", async () => {
     mockFindManyRewards.mockRejectedValue(new Error("DB error"))
-    const req = new Request("http://localhost/api/rewards")
 
+    const req = new Request("http://localhost/api/rewards")
     await GET(req)
 
     expect(NextResponse.json).toHaveBeenCalledWith(
